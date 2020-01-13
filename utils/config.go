@@ -8,7 +8,8 @@ import (
 )
 // Configurations json
 type Configurations struct {
-	Source []string `json:"source"`
+	Source string `json:"sourceFolder"`
+	Files []string `json:"files"`
 	Folder string `json:"backupFolder"`
 	LogFolder string `json:"logFolder"`
 	Format string `json:"backupFormat"`

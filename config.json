@@ -1,8 +1,12 @@
 {
-    "source": ["file1.txt", "file2.txt"],
-    "backupFolder": "backup",
-    "logFolder": "logs",
-    "exampleFormat": "2006-01-02 15:04:05",
-    "backupFormat": "20060102_150405",
-    "backupOnlyChanges": true
+	"sourceFolder": "/data",
+	"files": [
+        "files1.txt",
+        "files2.txt"
+	],
+	"backupFolder": "backups",
+	"logFolder": "logs",
+	"exampleFormat": "2006-01-02 15:04:05",
+	"backupFormat": "20060102_150405",
+	"backupOnlyChanges": true
 }
