@@ -13,28 +13,22 @@ type Info struct {
 }
 
 // Backup Backups file
-func Backup(src string, dst string) {
+func Backup(src string, dst string) (string, error) {
 	// Open source file
 	source, err := os.Open(src)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return "", err
 	}
 	defer source.Close()
 	// Open destination file
 	destination, err := os.Create(dst)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return "", err
 	}
 	defer destination.Close()
 	// copy file
 	nBytes, err := io.Copy(destination, source)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Printf("Written %d bytes\n", nBytes)
+	return fmt.Sprintf("Written %d bytes", nBytes), err
 }
 
 // GetLastBackup get last backup file info

@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,52 +15,70 @@ import (
 // Global Variables
 var (
 	Configs utils.Configurations
+	Log *log.Logger
 )
 
 func checksum(name string) (string) {
 	source, err := os.Open(name)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		Log.Fatalln(err)
 	}
 	defer source.Close()
 
 	hash := md5.New()
 	_, err = io.Copy(hash, source)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		Log.Fatalln(err)
 	}
 	sum := hash.Sum(nil)
 	return fmt.Sprintf("%x", sum)
 }
 
 func main() {
-	Configs = utils.GetConfigs()
 	currentTime := time.Now()
-	// Create backup folder
+	Configs, err := utils.GetConfigs()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Create backup and log folders
 	os.MkdirAll(Configs.Folder, os.ModePerm)
+	os.MkdirAll(Configs.LogFolder, os.ModePerm)
+	// Create Logger
+	logFile, err := os.OpenFile(filepath.Join(Configs.LogFolder, fmt.Sprintf("backup_%v.log", currentTime.Format("20060102"))), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		Log.Fatalln(err)
+	}
+	defer logFile.Close()
+	Log = log.New(io.MultiWriter(os.Stdout, logFile), "", log.LstdFlags)
+
+	Log.Println("Starting Backup Process")
 	for _, filename := range Configs.Source {
-		fmt.Printf("Processing %v\n", filename)
+		Log.Printf("Processing %v\n", filename)
 		backupName := strings.Replace(filename, filepath.Ext(filename), fmt.Sprintf("_%v%v", currentTime.Format(Configs.Format), filepath.Ext(filename)), 1)
 		if Configs.OnlyChanges {
 			// Get source stats
 			stat, err := os.Stat(filename)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(2)
+				Log.Fatalln(err)
 			}
 			// Get last backup stats
 			last, err := utils.GetLastBackup(Configs.Folder)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(3)
+				Log.Fatalln(err)
 			}
 			if last.Size != stat.Size() || checksum(last.Name) != checksum(filename) {
-				utils.Backup(filename, filepath.Join(Configs.Folder, backupName))
+				out, err := utils.Backup(filename, filepath.Join(Configs.Folder, backupName))
+				if err != nil {
+					Log.Fatalln(err)
+				}
+				Log.Println(out)
 			}
 		} else {
-			utils.Backup(filename, filepath.Join(Configs.Folder, backupName))
+			out, err := utils.Backup(filename, filepath.Join(Configs.Folder, backupName))
+			if err != nil {
+				Log.Fatalln(err)
+			}
+			Log.Println(out)
 		}
 	}
 }
