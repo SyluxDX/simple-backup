@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-    "path/filepath"
+	"path/filepath"
 )
 // Info Backup File info
 type Info struct {
-    Name string 
+	Name string 
 	Size int64
 }
 
@@ -44,18 +44,18 @@ func GetLastBackup(dir string) (Info, error){
 	var time int64
 	file.Size = 0
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-        if err != nil {
-            return err
-        }
-        // check if it is a regular file (not dir)
-        if info.Mode().IsRegular() {
+		if err != nil {
+			return err
+		}
+		// check if it is a regular file (not dir)
+		if info.Mode().IsRegular() {
 			if info.ModTime().Unix() > time {
 				file.Name = path
 				file.Size = info.Size()
 				time = info.ModTime().Unix()
 			}
-        }
-        return nil
+		}
+		return nil
 	})
 	return file, err
 }

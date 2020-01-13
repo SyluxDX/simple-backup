@@ -8,7 +8,7 @@ Had option to only backup file there were changes on the target file
 
 ```json
 {
-    "source": "file.txt",
+    "source": ["file1.txt", "file2.txt"],
     "backupFolder": "backup",
     "exampleFormat": "2006-01-02 15:04:05",
     "backupFormat": "20060102_150405",
@@ -17,7 +17,7 @@ Had option to only backup file there were changes on the target file
 ```
 | Field | Description |
 |---|---|
-| source | Path to the file to be backed up |
+| source | List with paths to the files to be backed up |
 | backupFolder | Folder where the backups file will be stored |
 | exampleFormat | This field shows Golang timestamp format string, it is unsued |
 | backupFormat | Datetime format that is appened to backup filename |

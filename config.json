@@ -1,5 +1,5 @@
 {
-    "source": "file.txt",
+    "source": ["file1.txt", "file2.txt"],
     "backupFolder": "backup",
     "exampleFormat": "2006-01-02 15:04:05",
     "backupFormat": "20060102_150405",
